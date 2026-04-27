@@ -1,0 +1,24 @@
+fastapi
+uvicorn
+httpx
+python-dotenv
+pydantic
+
+langchain
+langgraph
+langchain-ollama
+langchain_openai
+
+mcp
+fastmcp
+
+yfinance
+
+feedparser==6.0.10
+
+requests
+
+# memory service
+sqlmodel
+psycopg2-binary
+pgvector
