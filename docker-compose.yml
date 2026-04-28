@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: agentic_postgres_cybersecurity
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: agentic_cybersecurity_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U agentic121 -d agentic_db" ]
+      interval: 5s
+      retries: 5
+
+    pgadmin:
+      image: dpage/pgadmin4
+      container_name: agentic_pgadmin_cybersecurity
+      restart: always
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin@agentic.com
+        PGADMIN_DEFAULT_PASSWORD: 123456789
+      ports:
+        - "80:80"
+      
+
+volumes:
+  db_data:
