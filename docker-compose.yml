@@ -1,8 +1,7 @@
-version: "3.8"
-
 services:
   postgres:
     image: pgvector/pgvector:pg15
+    platform: linux/amd64
     container_name: agentic_postgres_cybersecurity
     restart: always
     environment:
@@ -13,13 +12,17 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myuser -d agentic_cybersecurity_db"]
       interval: 5s
       retries: 5
+    networks:
+      - agentic_net
 
   pgadmin:
     image: dpage/pgadmin4
+    platform: linux/amd64
     container_name: agentic_pgadmin_cybersecurity
     restart: always
     environment:
@@ -31,20 +34,28 @@ services:
       - postgres
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - agentic_net
 
   memory-service:
-    image: memory-service:latest
+    build: .
     container_name: agentic_memory_service
     working_dir: /app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn memory.main:app --host 0.0.0.0 --port 8000
     ports:
-      - "8000:8000"
+      - "1000:8000"
     environment:
       MEMORY_DB_URL: postgresql://myuser:mypassword@postgres:5432/agentic_cybersecurity_db
+      PYTHONPATH: /app
     depends_on:
       postgres:
         condition: service_healthy
-      
+    networks:
+      - agentic_net
+
 volumes:
   db_data:
   pgadmin_data:
+
+networks:
+  agentic_net:
