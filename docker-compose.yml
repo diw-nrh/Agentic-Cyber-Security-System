@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   postgres:
-    image: postgres:13
+    image: pgvector/pgvector:pg15
     container_name: agentic_postgres_cybersecurity
     restart: always
     environment:
@@ -14,20 +14,37 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U agentic121 -d agentic_db" ]
+      test: ["CMD-SHELL", "pg_isready -U myuser -d agentic_cybersecurity_db"]
       interval: 5s
       retries: 5
 
-    pgadmin:
-      image: dpage/pgadmin4
-      container_name: agentic_pgadmin_cybersecurity
-      restart: always
-      environment:
-        PGADMIN_DEFAULT_EMAIL: admin@agentic.com
-        PGADMIN_DEFAULT_PASSWORD: 123456789
-      ports:
-        - "80:80"
-      
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: agentic_pgadmin_cybersecurity
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@agentic.com
+      PGADMIN_DEFAULT_PASSWORD: 1234
+    ports:
+      - "5051:80"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
+  memory-service:
+    image: memory-service:latest
+    container_name: agentic_memory_service
+    working_dir: /app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      MEMORY_DB_URL: postgresql://myuser:mypassword@postgres:5432/agentic_cybersecurity_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+      
 volumes:
   db_data:
+  pgadmin_data:
