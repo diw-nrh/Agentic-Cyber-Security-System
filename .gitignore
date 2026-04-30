@@ -5,3 +5,5 @@ shared/__pycache__
 agent/__pycache__
 tools/__pycache__
 jupyter
+
+# Ignore Jupyter Notebook checkpoints
