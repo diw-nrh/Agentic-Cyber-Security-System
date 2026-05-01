@@ -53,6 +53,34 @@ services:
     networks:
       - agentic_net
 
+# example something service
+  something-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agentic-security-local:latest
+    container_name: something-service
+    working_dir: /app
+    command: uvicorn services.something_service.api:app --host 0.0.0.0 --port 9000
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+
+  something-server:
+    image: agentic-stocks-local:latest
+    container_name: mcp-something-server
+    working_dir: /app
+    command: python -m mcp_servers.something_server
+    depends_on:
+      - something-service
+    environment:
+      - SOMETHING_SERVICE_URL=http://something-service:9000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+
 volumes:
   db_data:
   pgadmin_data:

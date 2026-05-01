@@ -8,6 +8,10 @@ class Config:
         URL = "http://localhost:1000"
         DATABASE_URL = os.getenv("MEMORY_DB_URL")
 
+    class Something:
+        URL = os.getenv("SOMETHING_SERVICE_URL", "http://localhost:9000")
+        OPENSOMETHING_API_KEY = os.getenv("OPENSOMETHING_API_KEY")
+
     @classmethod
     def validate(cls):
         if not cls.Memory.DATABASE_URL:
